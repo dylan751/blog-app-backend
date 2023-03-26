@@ -13,4 +13,29 @@ router.post('/', async (req, res) => {
   }
 });
 
+// UPDATE POST
+router.put('/:id', async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    // Only the author of the post can update it
+    if (post.username === req.body.username) {
+      try {
+        const updatedPost = await Post.findByIdAndUpdate(
+          req.params.id,
+          { $set: req.body },
+          { new: true },
+        );
+
+        res.status(200).json(updatedPost);
+      } catch (err) {
+        res.status(500).json(err);
+      }
+    } else {
+      res.status(401).json('Only owner of this post can update it!');
+    }
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
 module.exports = router;
