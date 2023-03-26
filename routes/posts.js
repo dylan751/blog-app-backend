@@ -38,4 +38,24 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+// DELETE POST
+router.delete('/:id', async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    // nly the author of the post can update it
+    if (post.username === req.body.username) {
+      try {
+        await Post.findByIdAndDelete(req.params.id);
+        res.status(200).json('Post has been deleted');
+      } catch (err) {
+        res.status(500).json(err);
+      }
+    } else {
+      res.status(401).json('Only owner of this post can delete it!');
+    }
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
 module.exports = router;
