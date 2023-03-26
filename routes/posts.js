@@ -58,4 +58,35 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// GET ALL POSTS
+router.get('/', async (req, res) => {
+  const author = req.query.author;
+  const category = req.query.category;
+  try {
+    let posts;
+    if (author) {
+      posts = await Post.find({ username: author });
+    } else if (category) {
+      // Find all posts that include category
+      posts = await Post.find({ categories: { $in: [category] } });
+    } else {
+      posts = await Post.find();
+    }
+
+    res.status(200).json(posts);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+// GET 1 POST
+router.get('/:id', async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    res.status(200).json(post);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
 module.exports = router;
